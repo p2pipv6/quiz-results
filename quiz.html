@@ -59,7 +59,7 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.6</h1>
+  <h1>Patent Agent MCQ Quiz V1.7</h1>
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
@@ -86,28 +86,29 @@
     let questions = [];
 
     async function loadSheetList() {
+  const loading = document.getElementById("loading");
+  const select = document.getElementById("sheetSelect");
+  const submitBtn = document.getElementById("submitBtn");
 
-        const loading = document.getElementById("loading");
-        const select = document.getElementById("sheetSelect");
-        const submitBtn = document.getElementById("submitBtn");
-      
-        // ✅ Disable controls during loading
-        loading.style.display = "block";
-        select.disabled = true;
-        submitBtn.disabled = true;
-      
-      const res = await fetch(`${API_URL}?action=listSheets`);
-        const sheetNames = await res.json();
-      
-        const select = document.getElementById("sheetSelect");
-        select.innerHTML = "<option value=''>-- Select Topic --</option>";
-        sheetNames.forEach(name => {
-          const opt = document.createElement("option");
-          opt.value = name;
-          opt.textContent = name.replace("MCQ-", "");
-          select.appendChild(opt);
-        });
-      }
+  loading.style.display = "block";
+  select.disabled = true;
+  submitBtn.disabled = true;
+
+  const res = await fetch(`${API_URL}?action=listSheets`);
+  const sheetNames = await res.json();
+
+  select.innerHTML = "<option value=''>-- Select Topic --</option>";
+  sheetNames.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name.replace("MCQ-", "");
+    select.appendChild(opt);
+  });
+
+  select.disabled = false;        // ✅ Enable dropdown
+  loading.style.display = "none"; // ✅ Hide spinner
+}
+
 
     
     function shuffleArray(array) {
@@ -119,17 +120,19 @@
     }
     
 
-    async function loadQuestionsFromSelectedSheet() {
+ async function loadQuestionsFromSelectedSheet() {
   const sheet = document.getElementById("sheetSelect").value;
   if (!sheet) return;
 
+  const submitBtn = document.getElementById("submitBtn");
   document.getElementById("quizForm").innerHTML = "";
-  document.getElementById("result").innerText = "";  
-  submitBtn.disabled = false
+  document.getElementById("result").innerText = "";
+  submitBtn.disabled = true;
 
   document.getElementById("loading").style.display = "block";
   const res = await fetch(`${API_URL}?sheet=${encodeURIComponent(sheet)}`);
   questions = await res.json();
+
 
   questions = shuffleArray(questions);
 
@@ -152,6 +155,8 @@
 
   document.getElementById("submitBtn").disabled = false;
   document.getElementById("loading").style.display = "none";
+
+
 }
 
     
