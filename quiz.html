@@ -59,7 +59,7 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.3</h1>
+  <h1>Patent Agent MCQ Quiz V1.4</h1>
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
@@ -81,11 +81,20 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbw8nFQAiZ8rTdXre3uBGwadGnjrUhj-LYgDp6_j9CTfkiMW7XkyZ5Zi82u_D64lBWAa9A/exec";
     let questions = [];
 
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+    
     async function loadQuestions() {
       document.getElementById("loading").style.display = "block";
 
       const res = await fetch(API_URL);
       questions = await res.json();
+      questions = shuffleArray(questions);
       const form = document.getElementById("quizForm");
       form.innerHTML = "";
 
