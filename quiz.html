@@ -104,16 +104,12 @@
         `You scored ${score} out of ${questions.length}`;
     }
 
-    // Hardcoded correct answers (must match your sheet)
-    function getCorrectAnswer(id) {
-      const answerMap = {
-        1: "C",
-        2: "A",
-        3: "D",
-        // Add more like { id: "CorrectOption" }
-      };
-      return answerMap[id] || "";
-    }
+   
+   function getCorrectAnswer(id) 
+   {
+  const q = questions.find(q => q.id == id);
+  return q ? q.correct : "";
+  }
 
     loadQuestions();
   </script>
