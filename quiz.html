@@ -59,7 +59,7 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.7</h1>
+  <h1>Patent Agent MCQ Quiz V1.8</h1>
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
@@ -72,7 +72,8 @@
   
   <form id="quizForm"></form>
 
-  <button id="submitBtn" onclick="submitQuiz()">Submit Quiz</button>
+  <button id="submitBtn" onclick="submitQuiz()" disabled>Start Quiz</button>
+
 
   <div id="result"></div>
 
@@ -153,7 +154,10 @@
     form.appendChild(qBlock);
   });
 
-  document.getElementById("submitBtn").disabled = false;
+   const submitBtn = document.getElementById("submitBtn");
+  submitBtn.innerText = "Submit Quiz";
+  submitBtn.disabled = false;
+
   document.getElementById("loading").style.display = "none";
 
 
