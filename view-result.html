@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz Results</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      padding: 40px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .result-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label, input, button {
+      font-size: 16px;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .info {
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>View Quiz Result</h1>
+  <div class="result-box">
+    <label for="username">Enter your username:</label>
+    <input type="text" id="username" placeholder="e.g. alice" />
+    <button onclick="fetchResult()">View Result</button>
+
+    <div class="info" id="result"></div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+
+    async function fetchResult() {
+      const username = document.getElementById("username").value.trim();
+      const resultBox = document.getElementById("result");
+
+      if (!username) {
+        resultBox.innerHTML = "Please enter a username.";
+        return;
+      }
+
+      resultBox.innerHTML = "Loading...";
+
+      try {
+        const res = await fetch(`${API_URL}?action=view&username=${encodeURIComponent(username)}`);
+        const data = await res.json();
+
+        if (data.error) {
+          resultBox.innerHTML = `<b>Error:</b> ${data.error}`;
+        } else {
+          resultBox.innerHTML = `
+            <strong>Username:</strong> ${data.username}<br>
+            <strong>Quizzes Taken:</strong> ${data.quizzesTaken}<br>
+            <strong>Total Score:</strong> ${data.totalScore}<br>
+            <strong>Last Quiz Date:</strong> ${new Date(data.lastQuizDate).toLocaleDateString()}
+          `;
+        }
+      } catch (err) {
+        resultBox.innerHTML = "Something went wrong while fetching your result.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
