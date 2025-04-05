@@ -37,11 +37,30 @@
       margin-top: 20px;
       font-weight: bold;
     }
+    #loading {
+      display: none;
+      text-align: center;
+      margin: 20px;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #4CAF50;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.1</h1>
+  <h1>Patent Agent MCQ Quiz V1.2</h1>
+  
   <div>
     <label><strong>Enter your username:</strong></label><br>
     <input type="text" id="username" placeholder="e.g. alice" style="width: 100%; padding: 8px; margin-bottom: 20px;" />
@@ -49,15 +68,22 @@
 
   <form id="quizForm"></form>
 
-  <button onclick="submitQuiz()">Submit Quiz</button>
+  <button id="submitBtn" onclick="submitQuiz()">Submit Quiz</button>
 
   <div id="result"></div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbw8nFQAiZ8rTdXre3uBGwadGnjrUhj-LYgDp6_j9CTfkiMW7XkyZ5Zi82u_D64lBWAa9A/exec";
     let questions = [];
 
     async function loadQuestions() {
+      document.getElementById("loading").style.display = "block";
+
       const res = await fetch(API_URL);
       questions = await res.json();
       const form = document.getElementById("quizForm");
@@ -76,40 +102,60 @@
 
         form.appendChild(qBlock);
       });
+
+      document.getElementById("loading").style.display = "none";
     }
 
     async function submitQuiz() {
       const username = document.getElementById("username").value.trim();
+      const resultBox = document.getElementById("result");
+      const submitBtn = document.getElementById("submitBtn");
+      const loading = document.getElementById("loading");
+
       if (!username) {
         alert("Please enter your username.");
         return;
       }
 
+      // UI prep
+      resultBox.innerText = "";
+      submitBtn.disabled = true;
+      loading.style.display = "block";
+
       let score = 0;
 
       for (const q of questions) {
         const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-        if (selected && selected.value === getCorrectAnswer(q.id)) {
-          score++;
+        if (selected) {
+          const userAnswer = selected.value.trim().toUpperCase();
+          const correctAnswer = getCorrectAnswer(q.id);
+          if (userAnswer === correctAnswer) {
+            score++;
+          }
         }
       }
 
-      // POST score
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ username, score })
-      });
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify({ username, score })
+        });
 
-      document.getElementById("result").innerText =
-        `You scored ${score} out of ${questions.length}`;
+        resultBox.innerText = `✅ You scored ${score} out of ${questions.length}`;
+      } catch (err) {
+        console.error("Error submitting quiz:", err);
+        resultBox.innerText = "❌ Error submitting score. Please try again.";
+      }
+
+      // Reset UI
+      loading.style.display = "none";
+      submitBtn.disabled = false;
     }
 
-   
-   function getCorrectAnswer(id) 
-   {
-  const q = questions.find(q => q.id == id);
-  return q ? q.correct : "";
-  }
+    function getCorrectAnswer(id) {
+      const q = questions.find(q => q.id == id);
+      return q ? q.correct.trim().toUpperCase() : "";
+    }
 
     loadQuestions();
   </script>
