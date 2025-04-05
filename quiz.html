@@ -107,50 +107,66 @@
     }
 
     async function submitQuiz() {
-      const username = document.getElementById("username").value.trim();
-      const resultBox = document.getElementById("result");
-      const submitBtn = document.getElementById("submitBtn");
-      const loading = document.getElementById("loading");
+  const username = document.getElementById("username").value.trim();
+  const resultBox = document.getElementById("result");
+  const submitBtn = document.getElementById("submitBtn");
+  const loading = document.getElementById("loading");
 
-      if (!username) {
-        alert("Please enter your username.");
-        return;
+  if (!username) {
+    alert("Please enter your username.");
+    return;
+  }
+
+  resultBox.innerText = "";
+  submitBtn.disabled = true;
+  loading.style.display = "block";
+
+  let score = 0;
+
+  for (const q of questions) {
+    const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+    const correctIndex = ["A", "B", "C", "D"].indexOf(getCorrectAnswer(q.id));
+    const qContainer = document.querySelector(`.question input[name="q${q.id}"]`).closest(".question");
+    const labels = qContainer.querySelectorAll("label");
+
+    labels.forEach((label, i) => {
+      const input = label.querySelector("input");
+      if (i === correctIndex) {
+        // Highlight correct answer
+        label.style.backgroundColor = "#e0f9e0";
+        label.style.borderRadius = "5px";
+        label.title = q.explanation || "Correct answer";
       }
 
-      // UI prep
-      resultBox.innerText = "";
-      submitBtn.disabled = true;
-      loading.style.display = "block";
-
-      let score = 0;
-
-      for (const q of questions) {
-        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-        if (selected) {
-          const userAnswer = selected.value.trim().toUpperCase();
-          const correctAnswer = getCorrectAnswer(q.id);
-          if (userAnswer === correctAnswer) {
-            score++;
-          }
-        }
+      // Optional: Mark incorrect choices red
+      if (input.checked && i !== correctIndex) {
+        label.style.backgroundColor = "#fbeaea";
+        label.style.borderRadius = "5px";
       }
+    });
 
-      try {
-        await fetch(API_URL, {
-          method: "POST",
-          body: JSON.stringify({ username, score })
-        });
-
-        resultBox.innerText = `✅ You scored ${score} out of ${questions.length}`;
-      } catch (err) {
-        console.error("Error submitting quiz:", err);
-        resultBox.innerText = "❌ Error submitting score. Please try again.";
-      }
-
-      // Reset UI
-      loading.style.display = "none";
-      submitBtn.disabled = false;
+    if (selected && selected.value.trim().toUpperCase() === getCorrectAnswer(q.id)) {
+      score++;
     }
+  }
+
+  try {
+    await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ username, score })
+    });
+
+    resultBox.innerText = `✅ You scored ${score} out of ${questions.length}`;
+  } catch (err) {
+    console.error("Error submitting quiz:", err);
+    resultBox.innerText = "❌ Error submitting score. Please try again.";
+  }
+
+  loading.style.display = "none";
+  submitBtn.disabled = false;
+}
+
+    
 
     function getCorrectAnswer(id) {
       const q = questions.find(q => q.id == id);
