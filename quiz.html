@@ -59,13 +59,17 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.4</h1>
+  <h1>Patent Agent MCQ Quiz V1.5</h1>
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
     <input type="text" id="username" placeholder="e.g. alice" style="width: 100%; padding: 8px; margin-bottom: 20px;" />
   </div>
-
+<div>
+  <label><strong>Select Topic:</strong></label><br>
+  <select id="sheetSelect" onchange="loadQuestionsFromSelectedSheet()" style="width: 100%; padding: 8px; margin-bottom: 20px;"></select>
+</div>
+  
   <form id="quizForm"></form>
 
   <button id="submitBtn" onclick="submitQuiz()">Submit Quiz</button>
@@ -81,6 +85,21 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbw8nFQAiZ8rTdXre3uBGwadGnjrUhj-LYgDp6_j9CTfkiMW7XkyZ5Zi82u_D64lBWAa9A/exec";
     let questions = [];
 
+    async function loadSheetList() {
+        const res = await fetch(`${API_URL}?action=listSheets`);
+        const sheetNames = await res.json();
+      
+        const select = document.getElementById("sheetSelect");
+        select.innerHTML = "<option value=''>-- Select Topic --</option>";
+        sheetNames.forEach(name => {
+          const opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = name.replace("MCQ-", "");
+          select.appendChild(opt);
+        });
+      }
+
+    
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -89,31 +108,38 @@
       return array;
     }
     
-    async function loadQuestions() {
-      document.getElementById("loading").style.display = "block";
 
-      const res = await fetch(API_URL);
-      questions = await res.json();
-      questions = shuffleArray(questions);
-      const form = document.getElementById("quizForm");
-      form.innerHTML = "";
+    async function loadQuestionsFromSelectedSheet() {
+  const sheet = document.getElementById("sheetSelect").value;
+  if (!sheet) return;
 
-      questions.forEach((q, index) => {
-        const qBlock = document.createElement("div");
-        qBlock.className = "question";
+  document.getElementById("loading").style.display = "block";
+  const res = await fetch(`${API_URL}?sheet=${encodeURIComponent(sheet)}`);
+  questions = await res.json();
 
-        qBlock.innerHTML = `
-          <h3>Q${index + 1}. ${q.question}</h3>
-          ${q.options.map((opt, i) =>
-            `<label><input type="radio" name="q${q.id}" value="${String.fromCharCode(65 + i)}"> ${opt}</label><br>`
-          ).join("")}
-        `;
+  questions = shuffleArray(questions);
 
-        form.appendChild(qBlock);
-      });
+  const form = document.getElementById("quizForm");
+  form.innerHTML = "";
 
-      document.getElementById("loading").style.display = "none";
-    }
+  questions.forEach((q, index) => {
+    const qBlock = document.createElement("div");
+    qBlock.className = "question";
+
+    qBlock.innerHTML = `
+      <h3>Q${index + 1}. ${q.question}</h3>
+      ${q.options.map((opt, i) =>
+        `<label><input type="radio" name="q${q.id}" value="${String.fromCharCode(65 + i)}"> ${opt}</label><br>`
+      ).join("")}
+    `;
+
+    form.appendChild(qBlock);
+  });
+
+  document.getElementById("loading").style.display = "none";
+}
+
+    
 
     async function submitQuiz() {
   const username = document.getElementById("username").value.trim();
@@ -182,7 +208,8 @@
       return q ? q.correct.trim().toUpperCase() : "";
     }
 
-    loadQuestions();
+    loadSheetList();
+   
   </script>
 
 </body>
