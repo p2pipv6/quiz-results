@@ -59,7 +59,7 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.8</h1>
+  <h1>Patent Agent MCQ Quiz V1.9</h1>
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
@@ -121,7 +121,7 @@
     }
     
 
- async function loadQuestionsFromSelectedSheet() {
+async function loadQuestionsFromSelectedSheet() {
   const sheet = document.getElementById("sheetSelect").value;
   if (!sheet) return;
 
@@ -129,11 +129,11 @@
   document.getElementById("quizForm").innerHTML = "";
   document.getElementById("result").innerText = "";
   submitBtn.disabled = true;
+  submitBtn.innerText = "Loading...";
 
   document.getElementById("loading").style.display = "block";
   const res = await fetch(`${API_URL}?sheet=${encodeURIComponent(sheet)}`);
   questions = await res.json();
-
 
   questions = shuffleArray(questions);
 
@@ -154,14 +154,12 @@
     form.appendChild(qBlock);
   });
 
-   const submitBtn = document.getElementById("submitBtn");
+  // ✅ Set button text & enable after questions load
   submitBtn.innerText = "Submit Quiz";
   submitBtn.disabled = false;
-
   document.getElementById("loading").style.display = "none";
-
-
 }
+
 
     
 
