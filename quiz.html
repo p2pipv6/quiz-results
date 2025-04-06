@@ -60,7 +60,7 @@
 <body>
 
  <div style="text-align: center; margin-bottom: 30px;">
-  <h1>Patent Agent MCQ Quiz - V1.15</h1>
+  <h1>Patent Agent MCQ Quiz - V1.16</h1>
   <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only)</h3>
 </div>
   
@@ -89,29 +89,41 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbw8nFQAiZ8rTdXre3uBGwadGnjrUhj-LYgDp6_j9CTfkiMW7XkyZ5Zi82u_D64lBWAa9A/exec";
     let questions = [];
 
-    async function loadSheetList() {
+ async function loadSheetList() {
   const loading = document.getElementById("loading");
   const select = document.getElementById("sheetSelect");
   const submitBtn = document.getElementById("submitBtn");
 
+  // 🔒 Disable UI while loading
   loading.style.display = "block";
   select.disabled = true;
   submitBtn.disabled = true;
+  submitBtn.innerText = "Loading...";
 
-  const res = await fetch(`${API_URL}?action=listSheets`);
-  const sheetNames = await res.json();
+  try {
+    const res = await fetch(`${API_URL}?action=listSheets`);
+    const sheetNames = await res.json();
 
-  select.innerHTML = "<option value=''>-- Select Topic --</option>";
-  sheetNames.forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name.replace("MCQ-", "");
-    select.appendChild(opt);
-  });
+    select.innerHTML = "<option value=''>-- Select Topic --</option>";
+    sheetNames.forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name.replace("MCQ-", "");
+      select.appendChild(opt);
+    });
 
-  select.disabled = false;        // ✅ Enable dropdown
-  loading.style.display = "none"; // ✅ Hide spinner
+    // ✅ Enable UI after load
+    select.disabled = false;
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Start Quiz";
+  } catch (err) {
+    console.error("Error loading sheet list:", err);
+    submitBtn.innerText = "Error Loading";
+  }
+
+  loading.style.display = "none";
 }
+
 
 
     
