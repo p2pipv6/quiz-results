@@ -43,46 +43,74 @@
 <body>
   <h1>View Quiz Result</h1>
   <div class="result-box">
-    <label for="username">Enter your username:</label>
-    <input type="text" id="username" placeholder="e.g. alice" />
+    <label for="usernameSelect">Select your username:</label>
+    <select id="usernameSelect">
+    <option value="">-- Select User --</option>
+    </select>
+
     <button onclick="fetchResult()">View Result</button>
 
+    
+    
     <div class="info" id="result"></div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw8nFQAiZ8rTdXre3uBGwadGnjrUhj-LYgDp6_j9CTfkiMW7XkyZ5Zi82u_D64lBWAa9A/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbw8nFQAiZ8rTdXre3uBGwadGnjrUhj-LYgDp6_j9CTfkiMW7XkyZ5Zi82u_D64lBWAa9A/exec";
 
-    async function fetchResult() {
-      const username = document.getElementById("username").value.trim();
-      const resultBox = document.getElementById("result");
+  async function loadUserList() {
+    const select = document.getElementById("usernameSelect");
+    select.innerHTML = `<option value="">-- Select User --</option>`;
 
-      if (!username) {
-        resultBox.innerHTML = "Please enter a username.";
-        return;
-      }
+    try {
+      const res = await fetch(`${API_URL}?action=listUsers`);
+      const users = await res.json();
 
-      resultBox.innerHTML = "Loading...";
-
-      try {
-        const res = await fetch(`${API_URL}?action=view&username=${encodeURIComponent(username)}`);
-        const data = await res.json();
-
-        if (data.error) {
-          resultBox.innerHTML = `<b>Error:</b> ${data.error}`;
-        } else {
-          resultBox.innerHTML = `
-            <strong>Username:</strong> ${data.username}<br>
-            <strong>Quizzes Taken:</strong> ${data.quizzesTaken}<br>
-            <strong>Total Score:</strong> ${data.totalScore}<br>
-            <strong>Last Quiz Date:</strong> ${new Date(data.lastQuizDate).toLocaleDateString()}
-          `;
-        }
-      } catch (err) {
-        resultBox.innerHTML = "Something went wrong while fetching your result.";
-        console.error(err);
-      }
+      users.forEach(username => {
+        const opt = document.createElement("option");
+        opt.value = username;
+        opt.textContent = username;
+        select.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Error loading users:", err);
     }
-  </script>
+  }
+
+  async function fetchResult() {
+    const username = document.getElementById("usernameSelect").value;
+    const resultBox = document.getElementById("result");
+
+    if (!username) {
+      resultBox.innerHTML = "Please select a username.";
+      return;
+    }
+
+    resultBox.innerHTML = "Loading...";
+
+    try {
+      const res = await fetch(`${API_URL}?action=view&username=${encodeURIComponent(username)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        resultBox.innerHTML = `<b>Error:</b> ${data.error}`;
+      } else {
+        resultBox.innerHTML = `
+          <strong>Username:</strong> ${data.username}<br>
+          <strong>Quizzes Taken:</strong> ${data.quizzesTaken}<br>
+          <strong>Total Score:</strong> ${data.totalScore}<br>
+          <strong>Last Quiz Date:</strong> ${new Date(data.lastQuizDate).toLocaleDateString()}
+        `;
+      }
+    } catch (err) {
+      resultBox.innerHTML = "Something went wrong while fetching your result.";
+      console.error(err);
+    }
+  }
+
+  // Load users on page load
+  window.onload = loadUserList;
+</script>
+
 </body>
 </html>
