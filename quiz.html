@@ -59,11 +59,11 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz V1.9</h1>
+  <h1>(CONCLAVIT) Patent Agent MCQ Quiz V1.10</h1>
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
-    <input type="text" id="username" placeholder="e.g. alice" style="width: 100%; padding: 8px; margin-bottom: 20px;" />
+    <input type="text" id="username" placeholder="e.g. Ramchandran" style="width: 100%; padding: 8px; margin-bottom: 20px;" />
   </div>
 <div>
   <label><strong>Select Topic:</strong></label><br>
@@ -213,7 +213,23 @@ async function loadQuestionsFromSelectedSheet() {
       body: JSON.stringify({ username, score })
     });
 
-    resultBox.innerText = `✅ You scored ${score} out of ${questions.length}`;
+
+    const percentage = Math.round((score / questions.length) * 100);
+let classification = "";
+
+if (percentage >= 90) {
+  classification = "🟢 Excellent!";
+} else if (percentage >= 70) {
+  classification = "🟡 Good effort!";
+} else if (percentage >= 50) {
+  classification = "🟠 Needs Improvement";
+} else {
+  classification = "🔴 Try Again. Join Class regularly";
+}
+
+resultBox.innerText = `✅ ${username}, you scored ${score} out of ${questions.length} (${percentage}%).\n${classification}`;
+
+    
   } catch (err) {
     console.error("Error submitting quiz:", err);
     resultBox.innerText = "❌ Error submitting score. Please try again.";
