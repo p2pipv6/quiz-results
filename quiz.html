@@ -60,7 +60,7 @@
 <body>
 
  <div style="text-align: center; margin-bottom: 30px;">
-  <h1>Patent Agent MCQ Quiz - V1.14</h1>
+  <h1>Patent Agent MCQ Quiz - V1.15</h1>
   <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only)</h3>
 </div>
   
@@ -160,6 +160,9 @@ async function loadQuestionsFromSelectedSheet() {
   // ✅ Set button text & enable after questions load
   submitBtn.innerText = "Submit Quiz";
   submitBtn.disabled = false;
+  submitBtn.style.backgroundColor = "#4CAF50";
+  submitBtn.style.cursor = "pointer";
+
   document.getElementById("loading").style.display = "none";
 }
 
