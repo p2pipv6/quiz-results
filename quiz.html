@@ -59,8 +59,9 @@
 </head>
 <body>
 
-  <h1>Patent Agent MCQ Quiz- V1.12</h1>
-  <h3>(For Dr V's Students only)</h3>
+ <h1>Patent Agent MCQ Quiz - V1.13</h1>
+<h3 style="text-align: center; font-weight: normal; color: #555;">(For Dr V's Students only)</h3>
+
   
   <div>
     <label><strong>Enter your username:</strong></label><br>
@@ -233,7 +234,10 @@ if (percentage >= 90) {
 }
 
 resultBox.innerText = `✅ ${username}, you scored ${score} out of ${questions.length} (${percentage}%).\n${classification}`;
-
+submitBtn.innerText = "Quiz Submitted";
+submitBtn.disabled = true;
+submitBtn.style.backgroundColor = "#888";
+submitBtn.style.cursor = "not-allowed";
     
   } catch (err) {
     console.error("Error submitting quiz:", err);
@@ -241,7 +245,7 @@ resultBox.innerText = `✅ ${username}, you scored ${score} out of ${questions.l
   }
 
   loading.style.display = "none";
-  submitBtn.disabled = false;
+  //submitBtn.disabled = false;
 }
 
     
