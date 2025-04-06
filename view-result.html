@@ -96,11 +96,14 @@
         resultBox.innerHTML = `<b>Error:</b> ${data.error}`;
       } else {
         resultBox.innerHTML = `
-          <strong>Username:</strong> ${data.username}<br>
-          <strong>Quizzes Taken:</strong> ${data.quizzesTaken}<br>
-          <strong>Total Score:</strong> ${data.totalScore}<br>
-          <strong>Last Quiz Date:</strong> ${new Date(data.lastQuizDate).toLocaleDateString()}
-        `;
+          
+        <strong>Username:</strong> ${data.username}<br>
+        <strong>Quizzes Taken:</strong> ${data.quizzesTaken}<br>
+        <strong>Total Score:</strong> ${data.totalScore} out of ${data.totalPossible}<br>
+        <strong>Performance:</strong> ${Math.round((data.totalScore / data.totalPossible) * 100)}%<br>
+        <strong>Last Quiz Date:</strong> ${new Date(data.lastQuizDate).toLocaleDateString()}
+      `  ;
+        
       }
     } catch (err) {
       resultBox.innerHTML = "Something went wrong while fetching your result.";
