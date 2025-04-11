@@ -61,7 +61,7 @@
 
  <div style="text-align: center; margin-bottom: 30px;">
   <h1>Patent Agent MCQ Quiz</h1>
-  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.22_11042025)</h3>
+  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.23_11042025)</h3>
 </div>
   
   <div>
@@ -79,13 +79,11 @@
   <select id="sheetSelect" onchange="loadQuestionsFromSelectedSheet()" style="width: 100%; padding: 8px; margin-bottom: 20px;"></select>
 </div>
 
-  <div>
-  <label><strong>MCQs:</strong></label><br>
- </div>
+ 
   
   <div id="quizInfo" style="margin-bottom: 20px; font-style: italic; color: #555;"></div>
 
-  
+  <h2 id="mcqHeading" style="display:none; margin-top: 30px; color: #333;">📝 MCQs</h2>
   <form id="quizForm"></form>
 
   <button id="submitBtn" onclick="submitQuiz()" disabled style="background-color: #888; cursor: not-allowed;">Start Quiz</button>
@@ -199,7 +197,9 @@ if (data.info && data.info.length > 0) {
     else if (lower.includes("level")) icon = "🎯";
     else if (lower.includes("sub")) icon = "🧠";
 
- return `<div style="margin-bottom: 6px;">${icon} <b>${label}:</b> ${value}</div>`;
+ //return `<div style="margin-bottom: 6px;">${icon} <b>${label}:</b> ${value}</div>`;
+    const labelText = (icon === "ℹ️") ? "" : `<b>${label}:</b> `;
+return `<div style="margin-bottom: 6px;">${icon} ${labelText}${value}</div>`;
 }).join("");
 }
 
