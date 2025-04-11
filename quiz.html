@@ -61,7 +61,7 @@
 
  <div style="text-align: center; margin-bottom: 30px;">
   <h1>Patent Agent MCQ Quiz</h1>
-  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.19_11042025)</h3>
+  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.20_11042025)</h3>
 </div>
   
   <div>
@@ -182,12 +182,19 @@ async function loadQuestionsFromSelectedSheet() {
     questions = shuffleArray(data.questions || []);
 
     // ✅ Show Info lines if present
-    if (data.info && data.info.length > 0) {
-      infoBox.innerHTML = data.info.map((line, i) => {
-        const clean = line.replace(/^Info:\s*/i, '').trim();
-        return `ℹ️ <b>Info-${i + 1}</b>: ${clean}`;
-      }).join("<br>");
-    }
+   // ✅ Show Info lines if present
+if (data.info && data.info.length > 0) {
+  infoBox.innerHTML = data.info.map((row, i) => {
+    const label = row[0]?.trim() || `Info-${i + 1}`;
+    const value = row[1]?.trim() || '';
+    const icon = label.toLowerCase().includes("tag") ? "🏷️"
+               : label.toLowerCase().includes("level") ? "🎯"
+               : label.toLowerCase().includes("sub") ? "🧠"
+               : "ℹ️";
+    return `${icon} <b>${label}:</b> ${value}`;
+  }).join("<br>");
+}
+
 
     // ✅ Build questions UI
     const form = document.getElementById("quizForm");
