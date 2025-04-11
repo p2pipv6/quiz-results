@@ -61,7 +61,7 @@
 
  <div style="text-align: center; margin-bottom: 30px;">
   <h1>Patent Agent MCQ Quiz</h1>
-  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.23_11042025)</h3>
+  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.24_11042025)</h3>
 </div>
   
   <div>
@@ -168,9 +168,12 @@ async function loadQuestionsFromSelectedSheet() {
 
   const submitBtn = document.getElementById("submitBtn");
   const infoBox = document.getElementById("quizInfo");
+  const mcqHeading = document.getElementById("mcqHeading");
+
   document.getElementById("quizForm").innerHTML = "";
   document.getElementById("result").innerText = "";
   infoBox.innerHTML = "";
+  mcqHeading.style.display = "none";
   submitBtn.disabled = true;
   submitBtn.innerText = "Loading...";
 
@@ -183,26 +186,28 @@ async function loadQuestionsFromSelectedSheet() {
     // ✅ Extract and shuffle questions
     questions = shuffleArray(data.questions || []);
 
-if (data.info && data.info.length > 0) {
-  infoBox.innerHTML = data.info.map((row, i) => {
-    const label = row[0]?.trim() || `Info-${i + 1}`;
-    const value = row[1]?.trim() || '';
-    const lower = label.toLowerCase();
+    // ✅ Render info section
+    if (data.info && data.info.length > 0) {
+      infoBox.innerHTML = data.info.map((row, i) => {
+        const label = row[0]?.trim() || `Info-${i + 1}`;
+        const value = row[1]?.trim() || '';
+        const lower = label.toLowerCase();
 
-    let icon = "ℹ️"; // default
-    if (lower.includes("milestone") || lower.includes("event")) icon = "📅";
-    else if (lower.includes("highlight")) icon = "✨";
-    else if (lower.includes("keyword") || lower.includes("concept")) icon = "🧠";
-    else if (lower.includes("tag")) icon = "🏷️";
-    else if (lower.includes("level")) icon = "🎯";
-    else if (lower.includes("sub")) icon = "🧠";
+        let icon = "ℹ️"; // default icon
+        if (lower.includes("milestone") || lower.includes("event")) icon = "📅";
+        else if (lower.includes("highlight")) icon = "✨";
+        else if (lower.includes("keyword") || lower.includes("concept")) icon = "🧠";
+        else if (lower.includes("tag")) icon = "🏷️";
+        else if (lower.includes("level")) icon = "🎯";
+        else if (lower.includes("sub")) icon = "🧠";
 
- //return `<div style="margin-bottom: 6px;">${icon} <b>${label}:</b> ${value}</div>`;
-    const labelText = (icon === "ℹ️") ? "" : `<b>${label}:</b> `;
-return `<div style="margin-bottom: 6px;">${icon} ${labelText}${value}</div>`;
-}).join("");
-}
+        const labelText = (icon === "ℹ️") ? "" : `<b>${label}:</b> `;
+        return `<div style="margin-bottom: 6px;">${icon} ${labelText}${value}</div>`;
+      }).join("");
+    }
 
+    // ✅ Show MCQ heading
+    mcqHeading.style.display = "block";
 
     // ✅ Build questions UI
     const form = document.getElementById("quizForm");
@@ -232,6 +237,7 @@ return `<div style="margin-bottom: 6px;">${icon} ${labelText}${value}</div>`;
 
   document.getElementById("loading").style.display = "none";
 }
+
 
 
 
