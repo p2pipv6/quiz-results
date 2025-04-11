@@ -187,10 +187,14 @@ if (data.info && data.info.length > 0) {
   infoBox.innerHTML = data.info.map((row, i) => {
     const label = row[0]?.trim() || `Info-${i + 1}`;
     const value = row[1]?.trim() || '';
-    const icon = label.toLowerCase().includes("tag") ? "🏷️"
-               : label.toLowerCase().includes("level") ? "🎯"
-               : label.toLowerCase().includes("sub") ? "🧠"
-               : "ℹ️";
+     let icon = "ℹ️"; // default
+    if (lower.includes("milestone") || lower.includes("event")) icon = "📅";
+    else if (lower.includes("highlight")) icon = "✨";
+    else if (lower.includes("keyword") || lower.includes("concept")) icon = "🧠";
+    else if (lower.includes("tag")) icon = "🏷️";
+    else if (lower.includes("level")) icon = "🎯";
+    else if (lower.includes("sub")) icon = "🧠";
+    
     return `${icon} <b>${label}:</b> ${value}`;
   }).join("<br>");
 }
