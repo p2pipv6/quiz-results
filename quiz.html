@@ -61,7 +61,7 @@
 
  <div style="text-align: center; margin-bottom: 30px;">
   <h1>Patent Agent MCQ Quiz</h1>
-  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.18_11042025)</h3>
+  <h3 style="font-weight: normal; color: #555;">(For Dr V's Students only-V1.19_11042025)</h3>
 </div>
   
   <div>
@@ -78,6 +78,9 @@
   <label><strong>Select Topic:</strong></label><br>
   <select id="sheetSelect" onchange="loadQuestionsFromSelectedSheet()" style="width: 100%; padding: 8px; margin-bottom: 20px;"></select>
 </div>
+
+  <div id="quizInfo" style="margin-bottom: 20px; font-style: italic; color: #555;"></div>
+
   
   <form id="quizForm"></form>
 
@@ -162,42 +165,59 @@ async function loadQuestionsFromSelectedSheet() {
   if (!sheet) return;
 
   const submitBtn = document.getElementById("submitBtn");
+  const infoBox = document.getElementById("quizInfo");
   document.getElementById("quizForm").innerHTML = "";
   document.getElementById("result").innerText = "";
+  infoBox.innerHTML = "";
   submitBtn.disabled = true;
   submitBtn.innerText = "Loading...";
 
   document.getElementById("loading").style.display = "block";
-  const res = await fetch(`${API_URL}?sheet=${encodeURIComponent(sheet)}`);
-  questions = await res.json();
 
-  questions = shuffleArray(questions);
+  try {
+    const res = await fetch(`${API_URL}?sheet=${encodeURIComponent(sheet)}`);
+    const data = await res.json();
 
-  const form = document.getElementById("quizForm");
-  form.innerHTML = "";
+    // ✅ Extract and shuffle questions
+    questions = shuffleArray(data.questions || []);
 
-  questions.forEach((q, index) => {
-    const qBlock = document.createElement("div");
-    qBlock.className = "question";
+    // ✅ Show Info lines if present
+    if (data.info && data.info.length > 0) {
+      infoBox.innerHTML = data.info.map((line, i) => {
+        const clean = line.replace(/^Info:\s*/i, '').trim();
+        return `ℹ️ <b>Info-${i + 1}</b>: ${clean}`;
+      }).join("<br>");
+    }
 
-    qBlock.innerHTML = `
-      <h3>Q${index + 1}. ${q.question}</h3>
-      ${q.options.map((opt, i) =>
-        `<label><input type="radio" name="q${q.id}" value="${String.fromCharCode(65 + i)}"> ${opt}</label><br>`
-      ).join("")}
-    `;
+    // ✅ Build questions UI
+    const form = document.getElementById("quizForm");
+    questions.forEach((q, index) => {
+      const qBlock = document.createElement("div");
+      qBlock.className = "question";
+      qBlock.innerHTML = `
+        <h3>Q${index + 1}. ${q.question}</h3>
+        ${q.options.map((opt, i) =>
+          `<label><input type="radio" name="q${q.id}" value="${String.fromCharCode(65 + i)}"> ${opt}</label><br>`
+        ).join("")}
+      `;
+      form.appendChild(qBlock);
+    });
 
-    form.appendChild(qBlock);
-  });
+    // ✅ Update button UI
+    submitBtn.innerText = "Submit Quiz";
+    submitBtn.disabled = false;
+    submitBtn.style.backgroundColor = "#4CAF50";
+    submitBtn.style.cursor = "pointer";
 
-  // ✅ Set button text & enable after questions load
-  submitBtn.innerText = "Submit Quiz";
-  submitBtn.disabled = false;
-  submitBtn.style.backgroundColor = "#4CAF50";
-  submitBtn.style.cursor = "pointer";
+  } catch (err) {
+    console.error("Error loading questions:", err);
+    document.getElementById("quizForm").innerHTML = "<p style='color:red;'>Failed to load quiz questions.</p>";
+    submitBtn.innerText = "Start Quiz";
+  }
 
   document.getElementById("loading").style.display = "none";
 }
+
 
 
     
