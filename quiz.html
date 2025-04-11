@@ -99,21 +99,34 @@
     let categoryTopicMap = {};
 
 async function loadCategories() {
-  const res = await fetch(`${API_URL}?action=listCategories`);
-  categoryTopicMap = await res.json();
-
   const catSelect = document.getElementById("categorySelect");
-  catSelect.innerHTML = "<option value=''>-- Select Category --</option>";
-  for (const category in categoryTopicMap) {
-    const opt = document.createElement("option");
-    opt.value = category;
-    opt.textContent = category;
-    catSelect.appendChild(opt);
+  const loading = document.getElementById("loading");
+
+  // 🔄 Show spinner while loading
+  loading.style.display = "block";
+  catSelect.disabled = true;
+
+  try {
+    const res = await fetch(`${API_URL}?action=listCategories`);
+    categoryTopicMap = await res.json();
+
+    catSelect.innerHTML = "<option value=''>-- Select Category --</option>";
+    for (const category in categoryTopicMap) {
+      const opt = document.createElement("option");
+      opt.value = category;
+      opt.textContent = category;
+      catSelect.appendChild(opt);
+    }
+
+    catSelect.disabled = false;
+  } catch (err) {
+    console.error("Error loading categories:", err);
   }
 
-  // Disable topic dropdown until category is selected
-  document.getElementById("sheetSelect").disabled = true;
+  // ✅ Hide spinner after done
+  loading.style.display = "none";
 }
+
 
 function populateTopics() {
   const category = document.getElementById("categorySelect").value;
